@@ -1,7 +1,5 @@
 name: Jarvis APK Build (Telefondan)
-
 on: [push, workflow_dispatch]
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,9 +12,17 @@ jobs:
       - uses: android-actions/setup-android@v3
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-      - name: Build Debug APK (wrapper yoksa gradle ile)
+        with:
+          gradle-version: 8.7
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew || echo "no gradlew"
+      - name: Generate Wrapper if missing
         run: |
-          if [ -f "./gradlew" ]; then chmod +x gradlew && ./gradlew assembleDebug --stacktrace; else gradle assembleDebug --stacktrace; fi
+          if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+            gradle wrapper --gradle-version 8.7 || true
+          fi
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --stacktrace --info
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
