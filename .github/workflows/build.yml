@@ -18,18 +18,14 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.7
-      - name: Build Minimal APK (root)
-        run: |
-          if [ -f "./gradlew" ]; then chmod +x ./gradlew && ./gradlew assembleDebug --stacktrace || true; fi
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew && chmod +x jarvis-termux-apk/gradlew
       - name: Build Termux APK - Gri Daire Dalga
         run: |
           cd jarvis-termux-apk
-          chmod +x ./gradlew
           ./gradlew assembleDebug --stacktrace
-      - name: Upload APKs
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: jarvis-apks
-          path: |
-            app/build/outputs/apk/debug/*.apk
-            jarvis-termux-apk/app/build/outputs/apk/debug/*.apk
+          name: jarvis-gri-daire-apk
+          path: jarvis-termux-apk/app/build/outputs/apk/debug/*.apk
