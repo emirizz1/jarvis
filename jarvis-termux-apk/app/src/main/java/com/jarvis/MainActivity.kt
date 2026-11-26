@@ -89,7 +89,6 @@ class MainActivity : Activity(), TextToSpeech.OnInitListener {
         row.addView(inp); row.addView(send)
         root.addView(row)
 
-        // Basili tut konus
         mic.setOnTouchListener { _, e ->
             when(e.action){
                 MotionEvent.ACTION_DOWN -> startListen()
@@ -118,8 +117,9 @@ class MainActivity : Activity(), TextToSpeech.OnInitListener {
                 val t=r?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()
                 if(t!=null) onUser(t) else status.text="Anlayamadım"
             }
+            override fun onPartialResults(partialResults: Bundle?) {}
             override fun onError(e:Int){ status.text="Hata: $e"; wave.setSpeaking(false) }
-            override fun onRmsChanged(v:Float){ /* sen konusurken dalga durur, o yuzden volume guncellemiyoruz */ }
+            override fun onRmsChanged(v:Float){}
             override fun onReadyForSpeech(p:Bundle?){}
             override fun onBeginningOfSpeech(){}
             override fun onBufferReceived(b:ByteArray?){}
@@ -132,20 +132,15 @@ class MainActivity : Activity(), TextToSpeech.OnInitListener {
 
     private fun onUser(text:String){
         log.append("\nSen: $text\n")
-        // Burada normalde Gemini/Local'e gidecek, simdi demo cevap
         val reply = "Anladım \"$text\" — bunu öğrendim, bir dahakine dalga daha hızlı olacak."
         jarvisSpeak(reply)
-        // Shizuku örneği: whatsapp aç
-        // rish -c "am start -n com.whatsapp"
     }
 
     private fun jarvisSpeak(text:String){
         log.append("Jarvis: $text\n")
         status.text = "Jarvis konuşuyor..."
         wave.setSpeaking(true)
-        // TTS
         tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "jarvis")
-        // Sahte volume animasyonu (gercek Visualizer ile de yapilabilir)
         val h=android.os.Handler(mainLooper)
         var c=0
         val r=object:Runnable{
